@@ -1,0 +1,12 @@
+# Local Python environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime output
+agent_execution.log
+
+# Independent target/example repository; keep its Git history separate.
+/sample_repo/
