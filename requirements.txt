@@ -2,4 +2,6 @@ langgraph
 langchain
 langchain-ollama
 langchain-core
+langsmith
+python-dotenv
 pytest

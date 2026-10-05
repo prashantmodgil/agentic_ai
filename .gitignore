@@ -7,6 +7,9 @@ __pycache__/
 
 # Runtime output
 agent_execution.log
+.env
+.env.*
+!.env.example
 
 # Independent target/example repository; keep its Git history separate.
 /sample_repo/

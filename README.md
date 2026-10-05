@@ -2,7 +2,7 @@
 
 A command-line agent that takes a GitHub issue and a local Git repository, inspects the issue and code, updates implementation and tests when needed, runs the test suite, and can push a branch and open a pull request.
 
-The agent uses an LLM through Ollama and LangChain/LangGraph tools. It does not currently include a web UI or a RAG index; it reads the current repository files directly.
+The agent uses an LLM through Ollama and LangChain/LangGraph tools. Optional LangSmith tracing records agent/model/tool execution for observability. It does not currently include a web UI or a RAG index; it reads the current repository files directly.
 
 ## Architecture
 
@@ -29,6 +29,7 @@ issue_agent.cli -> issue_agent.runner
 - `issue_agent/tool_calls.py` — Normalizes and validates JSON-formatted tool requests from the model.
 - `issue_agent/state.py` — Holds mutable state for the active run.
 - `issue_agent/config.py` — Configures logging and agent settings.
+- LangSmith — Optional tracing integration; disabled unless explicitly enabled with environment variables.
 - `test_agent.py` — regression tests for repository validation, tool arguments, issue handling, no-change termination, and the workflow.
 - `.vscode/launch.json` — VS Code launch configuration for issue `1` and `./sample_repo`.
 - `requirements.txt` — Python dependencies.
@@ -42,6 +43,7 @@ The agent project and `sample_repo/` are independent Git repositories. The agent
 - [GitHub CLI](https://cli.github.com/) installed and authenticated with access to the target repository.
 - [Ollama](https://ollama.com/) installed and running, with the `llama3.1` model available.
 - A local clone of the GitHub repository to work on.
+- A LangSmith account and API key only if you want remote tracing (optional).
 
 The GitHub CLI identifies the issue using the target repository's Git context. The issue number must exist in that repository, and the authenticated GitHub account must have access to it. To create a PR, the target repository must also have a writable `origin` remote.
 
@@ -94,6 +96,20 @@ python agent.py 42 "C:\path\to\another-repository"
 ```
 
 The issue is fetched from that repository's GitHub context. If the issue requires changes and tests pass, the agent can commit and push a branch and open a real pull request in that repository. Use a disposable test repository if you do not intend to publish changes.
+
+### Optional LangSmith tracing
+
+LangSmith tracing is opt-in. Copy `.env.example` to `.env` in the agent project root, add your API key, and change tracing to `true`:
+
+```dotenv
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=your-langsmith-api-key
+LANGSMITH_PROJECT=github-issue-agent
+```
+
+The generated `.env` starts with tracing disabled so no runs are uploaded until you opt in. The agent loads `.env` automatically at startup, and `.env` is ignored by Git. Alternatively, set these variables in the shell; existing shell environment variables take precedence over values from `.env`. `LANGSMITH_PROJECT` is optional; if omitted, the agent uses `github-issue-agent`. Set `LANGSMITH_TRACING=false` or remove it to disable tracing. Keep the API key out of source control, logs, and shared launch configuration.
+
+When enabled, LangSmith receives traces containing model prompts and responses, issue text, tool calls, and tool results. These can include source code read from the target repository. Enable tracing only when the repository data is permitted to be sent to your LangSmith workspace.
 
 The VS Code configuration can also be started from **Run and Debug**. Change its issue number and repository path in `.vscode/launch.json` before use.
 

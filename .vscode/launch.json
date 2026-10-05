@@ -5,15 +5,30 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Run Agent",
+            "name": "Python: Run GitHub Issue Agent",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/agent.py",
+            "python": "${command:python.interpreterPath}",
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
             "args": [
-                "1",
-                "./sample_repo"
+                "${input:issueNumber}",
+                "${input:targetRepository}"
             ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "issueNumber",
+            "type": "promptString",
+            "description": "GitHub issue number"
+        },
+        {
+            "id": "targetRepository",
+            "type": "promptString",
+            "description": "Path to a clean target repository's local Git clone"
         }
     ]
 }

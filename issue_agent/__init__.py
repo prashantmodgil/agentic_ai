@@ -2,7 +2,7 @@
 
 import subprocess
 
-from .config import MAX_AGENT_TOOL_CALLS, logger
+from .config import MAX_AGENT_TOOL_CALLS, configure_langsmith_tracing, logger
 from .state import (
     STATE,
     AgentFinishedWithoutChanges,
@@ -36,7 +36,8 @@ from .runner import ChatOllama, create_agent, run_agentic_fix
 
 __all__ = [
     "STATE", "AgentFinishedWithoutChanges", "GitHubIssueNotFoundError",
-    "GitHubRepositoryUnavailableError", "MAX_AGENT_TOOL_CALLS", "logger",
+    "GitHubRepositoryUnavailableError", "MAX_AGENT_TOOL_CALLS",
+    "configure_langsmith_tracing", "logger",
     "subprocess", "_checkout_issue_branch", "_fetch_issue_details",
     "_omitted_python_definitions", "_prepare_repository", "_resolve_repo_path",
     "_extract_text_tool_call", "_message_text",

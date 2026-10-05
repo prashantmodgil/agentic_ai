@@ -5,7 +5,12 @@ from langchain_core.messages import HumanMessage
 from langchain_ollama import ChatOllama
 from langgraph.errors import GraphRecursionError
 
-from .config import MAX_AGENT_TOOL_CALLS, MODEL_NAME, logger
+from .config import (
+    MAX_AGENT_TOOL_CALLS,
+    MODEL_NAME,
+    configure_langsmith_tracing,
+    logger,
+)
 from .repository import _fetch_issue_details, _prepare_repository
 from .state import AgentFinishedWithoutChanges, STATE, GitHubIssueNotFoundError, GitHubRepositoryUnavailableError
 from .tool_calls import (
@@ -123,6 +128,7 @@ def run_agentic_fix(issue_number: int, repo_path: str) -> int:
     logger.info("================ STARTING LANGGRAPH AGENT ================")
     
     try:
+        configure_langsmith_tracing()
         llm = ChatOllama(model=MODEL_NAME, temperature=0)
         agent_executor = create_agent(model=llm, tools=tools, system_prompt=system_prompt)
         tool_by_name = {agent_tool.name: agent_tool for agent_tool in tools}

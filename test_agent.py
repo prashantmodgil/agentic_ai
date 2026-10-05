@@ -32,6 +32,24 @@ def test_logging_handles_unicode_on_legacy_windows_console(tmp_path):
     assert b"Unicode: \\u2193" in result.stdout
 
 
+def test_langsmith_tracing_is_opt_in(monkeypatch):
+    monkeypatch.delenv("LANGSMITH_TRACING", raising=False)
+    monkeypatch.delenv("LANGSMITH_PROJECT", raising=False)
+    monkeypatch.delenv("LANGSMITH_API_KEY", raising=False)
+
+    assert agent.configure_langsmith_tracing() is False
+    assert "LANGSMITH_PROJECT" not in os.environ
+
+
+def test_langsmith_tracing_uses_configured_project(monkeypatch):
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")
+    monkeypatch.setenv("LANGSMITH_PROJECT", "custom-agent-project")
+    monkeypatch.setenv("LANGSMITH_API_KEY", "test-only-key")
+
+    assert agent.configure_langsmith_tracing() is True
+    assert os.environ["LANGSMITH_PROJECT"] == "custom-agent-project"
+
+
 def initialize_repository(path):
     subprocess.run(["git", "init", str(path)], check=True, capture_output=True)
     subprocess.run(
